@@ -1,7 +1,7 @@
 const sdk = require('node-appwrite');
 
 const client = new sdk.Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT) 
+    .setEndpoint(process.env.APPWRITE_ENDPOINT)
     .setProject(process.env.APPWRITE_PROJECT)
     .setKey(process.env.APPWRITE_KEY);
 
@@ -15,21 +15,21 @@ async function deleteOldPosts() {
     console.log(`Checking for posts older than: ${isoDate}`);
 
     try {
-        // Query ကို variable တစ်ခုအနေနဲ့ အရင်ထုတ်လိုက်တာက ပိုစိတ်ချရပါတယ်
-        const queries = [
-            sdk.Query.lessThan('$createdAt', isoDate)
-        ];
-
+        // Query ကို array အနေနဲ့ သေချာပို့ပါမယ်
         const response = await databases.listDocuments(
             process.env.DB_ID,
             process.env.COLLECTION_ID,
-            queries
+            [
+                sdk.Query.lessThan('$createdAt', isoDate)
+            ]
         );
 
         if (response.documents.length === 0) {
             console.log("No old posts found.");
             return;
         }
+
+        console.log(`Found ${response.documents.length} posts to delete.`);
 
         for (const doc of response.documents) {
             await databases.deleteDocument(
@@ -41,8 +41,9 @@ async function deleteOldPosts() {
         }
         console.log("Cleanup finished successfully!");
     } catch (error) {
-        // Error message အပြည့်အစုံကို မြင်ရအောင် စစ်ပါမယ်
-        console.error("Detailed Error:", error);
+        console.error("Cleanup Error:", error.message);
+        // Error အပြည့်အစုံကို log မှာ ထုတ်ကြည့်မယ်
+        if (error.response) console.log("Response data:", error.response);
         process.exit(1);
     }
 }

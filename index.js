@@ -1,6 +1,5 @@
 const sdk = require('node-appwrite');
 
-// GitHub Secrets ကနေ data တွေကို ဆွဲယူမယ်
 const client = new sdk.Client()
     .setEndpoint(process.env.APPWRITE_ENDPOINT) 
     .setProject(process.env.APPWRITE_PROJECT)
@@ -16,10 +15,15 @@ async function deleteOldPosts() {
     console.log(`Checking for posts older than: ${isoDate}`);
 
     try {
+        // Query ကို variable တစ်ခုအနေနဲ့ အရင်ထုတ်လိုက်တာက ပိုစိတ်ချရပါတယ်
+        const queries = [
+            sdk.Query.lessThan('$createdAt', isoDate)
+        ];
+
         const response = await databases.listDocuments(
             process.env.DB_ID,
             process.env.COLLECTION_ID,
-            [sdk.Query.lessThan('$createdAt', isoDate)]
+            queries
         );
 
         if (response.documents.length === 0) {
@@ -37,8 +41,9 @@ async function deleteOldPosts() {
         }
         console.log("Cleanup finished successfully!");
     } catch (error) {
-        console.error("Error during cleanup:", error.message);
-        process.exit(1); 
+        // Error message အပြည့်အစုံကို မြင်ရအောင် စစ်ပါမယ်
+        console.error("Detailed Error:", error);
+        process.exit(1);
     }
 }
 

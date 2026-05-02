@@ -1,1 +1,30 @@
+name: Daily Appwrite Cleanup
 
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Cleanup Script
+        run: node index.js
+        env:
+          APPWRITE_ENDPOINT: ${{ secrets.APPWRITE_ENDPOINT }}
+          APPWRITE_PROJECT: ${{ secrets.APPWRITE_PROJECT }}
+          APPWRITE_KEY: ${{ secrets.APPWRITE_KEY }}
+          DB_ID: ${{ secrets.DB_ID }}
+          COLLECTION_ID: ${{ secrets.COLLECTION_ID }}

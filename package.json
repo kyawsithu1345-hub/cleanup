@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
-    "node-appwrite": "10.1.0"
+    "node-appwrite": "^11.1.1"
   }
 }

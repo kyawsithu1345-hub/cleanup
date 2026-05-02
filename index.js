@@ -15,7 +15,7 @@ async function deleteOldPosts() {
     console.log(`Checking for posts older than: ${isoDate}`);
 
     try {
-        // Query ကို array အနေနဲ့ သေချာပို့ပါမယ်
+        // Version 10 အတွက် Query ပို့ပုံ
         const response = await databases.listDocuments(
             process.env.DB_ID,
             process.env.COLLECTION_ID,
@@ -29,21 +29,16 @@ async function deleteOldPosts() {
             return;
         }
 
-        console.log(`Found ${response.documents.length} posts to delete.`);
-
         for (const doc of response.documents) {
             await databases.deleteDocument(
                 process.env.DB_ID, 
                 process.env.COLLECTION_ID, 
                 doc.$id
             );
-            console.log(`Deleted post ID: ${doc.$id}`);
+            console.log(`Deleted: ${doc.$id}`);
         }
-        console.log("Cleanup finished successfully!");
     } catch (error) {
-        console.error("Cleanup Error:", error.message);
-        // Error အပြည့်အစုံကို log မှာ ထုတ်ကြည့်မယ်
-        if (error.response) console.log("Response data:", error.response);
+        console.error("Error:", error.message);
         process.exit(1);
     }
 }
